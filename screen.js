@@ -38,7 +38,7 @@ keyboard.addEventListener("click", (e) => {
         if (inputBuffer.length === 4) {
           if (inputBuffer === CORRECT_PIN) {
             inputBuffer = "";
-            setings();
+            menu();
           } else {
             screenUp.innerHTML = "Неверный пароль";
             screenDown.innerHTML = "";
@@ -138,9 +138,9 @@ function logs() {
   console.log(screenID);
 }
 
-function setings() {
-  screenUp.innerHTML = "Настройки";
-  screenDown.innerHTML = "";
+function menu() {
+  screenUp.innerHTML = "1 этаж, каб. 10";
+  screenDown.innerHTML = "Взят";
   lock.classList.add("hide");
   screenID = 2;
   console.log(screenID);
