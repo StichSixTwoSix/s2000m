@@ -26,31 +26,83 @@ keyboard.addEventListener("click", (e) => {
 
   const val = btn.dataset.val;
 
-  // Если нажата цифра (длиной 1 символ)
-  if (val.length === 1 && !isNaN(val) && screenID === 1) {
-    inputBuffer += val;
-    screenUp.innerHTML = "Пароль:";
-    screenDown.innerHTML = "*".repeat(inputBuffer.length); // Имитация скрытия
+  switch (screenID) {
+    case 1:
+      // Экран Пожар
+      if (val.length === 1 && !isNaN(val)) {
+        inputBuffer += val;
+        screenUp.innerHTML = "Пароль:";
+        screenDown.innerHTML = "*".repeat(inputBuffer.length); // Имитация скрытия
 
-    // Автозапуск при достижении 4 символов
-    if (inputBuffer.length === 4) {
-      if (inputBuffer === CORRECT_PIN) {
+        // Автозапуск при достижении 4 символов
+        if (inputBuffer.length === 4) {
+          if (inputBuffer === CORRECT_PIN) {
+            inputBuffer = "";
+            setings();
+          } else {
+            screenUp.innerHTML = "Неверный пароль";
+            screenDown.innerHTML = "";
+            inputBuffer = "";
+            setTimeout(fire, 2000); // Сброс через 1.5 сек после ошибки
+          }
+        }
+      } else if (val === "cancel") {
         inputBuffer = "";
-        setings();
-      } else {
-        screenUp.innerHTML = "Неверный пароль";
-        screenDown.innerHTML = "";
+        fire();
+      } else if (val === "home") {
         inputBuffer = "";
-        setTimeout(fire, 2000); // Сброс через 1.5 сек после ошибки
+        logs();
       }
-    }
-  } else if (val === "cancel") {
-    inputBuffer = "";
-    fire();
-  } else if (val === "home") {
-    inputBuffer = "";
-    logs();
+      break;
+    case 2:
+      console.log(val);
+      if (val === "cancel") {
+        inputBuffer = "";
+        fire();
+      } else if (val === "home") {
+        inputBuffer = "";
+        logs();
+      }
+      // Code to execute if expression === value2
+      break;
+    case 3:
+      // Code to execute if expression === value2
+      console.log("3" + val);
+      if (val === "cancel") {
+        inputBuffer = "";
+        fire();
+      } else if (val === "home") {
+        inputBuffer = "";
+        logs();
+      }
+      break;
+    case 4:
+      // Code to execute if expression === value2
+      break;
+    case 5:
+      // Code to execute if expression === value2
+      break;
+    case 6:
+      // Code to execute if expression === value2
+      break;
+    case 7:
+      // Code to execute if expression === value2
+      break;
+    case 8:
+      // Code to execute if expression === value2
+      break;
+    case 9:
+      // Code to execute if expression === value2
+      break;
+    case 10:
+      // Code to execute if expression === value2
+      break;
+    // ... more cases
+    default:
+    // Code to execute if no case matches
   }
+
+  // Если нажата цифра (длиной 1 символ)
 });
 
 function init() {
@@ -74,6 +126,7 @@ function fire() {
   screenDown.innerHTML = "1 этаж, каб. 10";
   lock.classList.remove("hide");
   screenID = 1;
+
   console.log(screenID);
 }
 
