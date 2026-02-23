@@ -13,9 +13,13 @@ let startDate;
 let startTime;
 let screenID;
 
-const menuItems = [clearAlarm, armed, disarmed];
+const menuItems = [clearAlarm, armed, brakeAlarm];
 const labelsItems = ["ВЗЯТЬ", "СНЯТЬ", "СБРОС ТРЕВОГ"];
 let index = 0;
+const updateUI = () => {
+  screenUp.innerHTML = labelsItems[index];
+  screenDown.innerHTML = "";
+};
 
 init();
 
@@ -92,6 +96,8 @@ keyboard.addEventListener("click", (e) => {
       }
       break;
     case 5: // Code to execute if expression === value2
+      break;
+    case 6: // Code to execute if expression === value2
       console.log("Сброс");
 
       if (val === "cancel") {
@@ -100,21 +106,31 @@ keyboard.addEventListener("click", (e) => {
         clearAlarm();
       }
       break;
-    case 6: // Code to execute if expression === value2
+    case 7: // Code to execute if expression === value2
       if (val === "cancel") {
         lock.classList.remove("hide");
         init();
       }
 
       break;
-    case 7: // Code to execute if expression === value2
-      break;
     case 8: // Code to execute if expression === value2
       break;
     case 9: // Code to execute if expression === value2
       break;
-    case 10: // Code to execute if expression === value2
-      break; // ... more cases
+    case 10: // Перебор меню
+      if (val === "cancel") {
+        menu();
+      } else if (val === "left") {
+        index = (index - 1 + menuItems.length) % menuItems.length;
+        updateUI();
+      } else if (val === "right") {
+        index = (index + 1) % menuItems.length;
+        updateUI();
+      } else if (val === "ok") {
+        menuItems[index](); // Запуск функции по индексу
+        screenDown.innerHTML = "";
+      }
+      break;
   }
 
   // Если нажата цифра (длиной 1 символ)
@@ -193,13 +209,14 @@ function firelog() {
 }
 
 function menu() {
-  screenID = 2;
+  screenID = 10;
+  lock.classList.add("hide");
+  updateUI();
 }
 
 function setClearAlarm() {
   screenUp.innerHTML = "1 этаж, каб. 10";
   screenDown.innerHTML = "Пожар: 1";
-  lock.classList.add("hide");
   screenID = 5;
 }
 
