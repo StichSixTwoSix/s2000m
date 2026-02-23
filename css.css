@@ -74,6 +74,10 @@ body {
   animation: blink 1s infinite; /* 1 секунда, бесконечно */
 }
 
+.muted {
+  fill: #ffff00 !important;
+}
+
 .traning {
   position: fixed;
   left: 0;

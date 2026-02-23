@@ -12,12 +12,13 @@ let timerId; // Создаем переменную для хранения ID �
 let startDate;
 let startTime;
 let screenID;
+let arm = 1;
 
 const menuItems = [clearAlarm, armed, brakeAlarm];
 const labelsItems = ["ВЗЯТЬ", "СНЯТЬ", "СБРОС ТРЕВОГ"];
-let index = 0;
+let menuIndex = 0;
 const updateUI = () => {
-  screenUp.innerHTML = labelsItems[index];
+  screenUp.innerHTML = labelsItems[menuIndex];
   screenDown.innerHTML = "";
 };
 
@@ -47,7 +48,7 @@ keyboard.addEventListener("click", (e) => {
         if (inputBuffer.length === 4) {
           if (inputBuffer === CORRECT_PIN) {
             inputBuffer = "";
-            menu();
+            passed();
           } else {
             screenUp.innerHTML = "Неверный пароль";
             screenDown.innerHTML = "";
@@ -64,7 +65,6 @@ keyboard.addEventListener("click", (e) => {
       }
       break;
     case 2: // Меню
-      console.log(val);
       if (val === "cancel") {
         inputBuffer = "";
         fire();
@@ -90,28 +90,31 @@ keyboard.addEventListener("click", (e) => {
       }
       break;
     case 4: // Событие
-      // Code to execute if expression === value2
       if (val === "cancel") {
         logs();
       }
       break;
-    case 5: // Code to execute if expression === value2
+    case 5: // Принят пароль
+      if (val === "cancel") {
+        fire();
+      } else if (val === "menu") {
+        menu();
+      } else if (val === "reset") {
+        brakeAlarm();
+      }
       break;
-    case 6: // Code to execute if expression === value2
-      console.log("Сброс");
-
+    case 6: // Сбросить тревоги?
       if (val === "cancel") {
         menu();
       } else if (val === "ok") {
         clearAlarm();
       }
       break;
-    case 7: // Code to execute if expression === value2
+    case 7: // Сброшено
       if (val === "cancel") {
         lock.classList.remove("hide");
         init();
       }
-
       break;
     case 8: // Code to execute if expression === value2
       break;
@@ -119,21 +122,35 @@ keyboard.addEventListener("click", (e) => {
       break;
     case 10: // Перебор меню
       if (val === "cancel") {
-        menu();
+        passed();
       } else if (val === "left") {
-        index = (index - 1 + menuItems.length) % menuItems.length;
+        menuIndex = (menuIndex + 1) % menuItems.length;
         updateUI();
       } else if (val === "right") {
-        index = (index + 1) % menuItems.length;
+        menuIndex = (menuIndex - 1 + menuItems.length) % menuItems.length;
         updateUI();
       } else if (val === "ok") {
-        menuItems[index](); // Запуск функции по индексу
-        screenDown.innerHTML = "";
+        switch (menuIndex) {
+          case 0:
+            armed();
+            break;
+          case 1:
+            brakeAlarm();
+            break;
+          case 2:
+            clearAlarm();
+            break;
+        }
+        // menuItems[menuIndex](); // Запуск функции по индексу
+      } else if (val === "reset") {
+        brakeAlarm();
       }
       break;
   }
 
-  // Если нажата цифра (длиной 1 символ)
+  if (val === "mute") {
+    document.querySelector("#l-mute").classList.toggle("muted");
+  }
 });
 
 function init() {
@@ -154,8 +171,6 @@ traning.addEventListener("click", function () {
   const now = new Date();
   startDate = now.toLocaleDateString();
   startTime = now.toLocaleTimeString();
-  console.log(startDate);
-  console.log(startTime);
 });
 
 function fire() {
@@ -163,8 +178,18 @@ function fire() {
   screenDown.innerHTML = "1 этаж, каб. 10";
   lock.classList.remove("hide");
   screenID = 1;
-
-  console.log(screenID);
+  document.querySelector("#bok").addEventListener("mousedown", () => {
+    if (screenID === 1) {
+      screenUp.innerHTML = `${startTime}`;
+      screenDown.innerHTML = `${startDate}`;
+    }
+  });
+  document.querySelector("#bok").addEventListener("mouseup", () => {
+    if (screenID === 1) {
+      screenUp.innerHTML = "10-ПОЖАР";
+      screenDown.innerHTML = "1 этаж, каб. 10";
+    }
+  });
 }
 
 function logs() {
@@ -172,7 +197,6 @@ function logs() {
   screenDown.innerHTML = "";
   lock.classList.remove("hide");
   screenID = 3;
-  console.log(screenID);
 }
 
 function firelog() {
@@ -180,43 +204,54 @@ function firelog() {
   screenDown.innerHTML = "";
   lock.classList.remove("hide");
   screenID = 4;
-  console.log(screenID);
 
   document.querySelector("#b1").addEventListener("mousedown", () => {
-    screenUp.innerHTML = "адрес 1 датчик 5";
-    screenDown.innerHTML = "";
+    if (screenID === 4) {
+      screenUp.innerHTML = "адрес 1 датчик 5";
+      screenDown.innerHTML = "";
+    }
   });
   document.querySelector("#b1").addEventListener("mouseup", () => {
-    screenUp.innerHTML = "1 этаж, каб. 10";
-    screenDown.innerHTML = "";
+    if (screenID === 4) {
+      screenUp.innerHTML = "1 этаж, каб. 10";
+      screenDown.innerHTML = "";
+    }
   });
   document.querySelector("#b2").addEventListener("mousedown", () => {
-    screenUp.innerHTML = "1 этаж, каб. 10";
-    screenDown.innerHTML = "адрес 1 датчик 5";
+    if (screenID === 4) {
+      screenUp.innerHTML = "1 этаж, каб. 10";
+      screenDown.innerHTML = "адрес 1 датчик 5";
+    }
   });
   document.querySelector("#b2").addEventListener("mouseup", () => {
-    screenUp.innerHTML = "1 этаж, каб. 10";
-    screenDown.innerHTML = "";
+    if (screenID === 4) {
+      screenUp.innerHTML = "1 этаж, каб. 10";
+      screenDown.innerHTML = "";
+    }
   });
   document.querySelector("#b0").addEventListener("mousedown", () => {
-    screenUp.innerHTML = `${startTime}`;
-    screenDown.innerHTML = `${startDate}`;
+    if (screenID === 4) {
+      screenUp.innerHTML = `${startTime}`;
+      screenDown.innerHTML = `${startDate}`;
+    }
   });
   document.querySelector("#b0").addEventListener("mouseup", () => {
-    screenUp.innerHTML = "1 этаж, каб. 10";
-    screenDown.innerHTML = "";
+    if (screenID === 4) {
+      screenUp.innerHTML = "1 этаж, каб. 10";
+      screenDown.innerHTML = "";
+    }
   });
 }
 
 function menu() {
   screenID = 10;
-  lock.classList.add("hide");
   updateUI();
 }
 
-function setClearAlarm() {
+function passed() {
   screenUp.innerHTML = "1 этаж, каб. 10";
   screenDown.innerHTML = "Пожар: 1";
+  lock.classList.add("hide");
   screenID = 5;
 }
 
@@ -230,8 +265,17 @@ function clearAlarm() {
   screenUp.innerHTML = "Сброшено";
   screenDown.innerHTML = "";
   lFire.classList.remove("fire");
+  document.querySelector("#l-mute").classList.remove("muted");
   screenID = 7;
 }
 
-function armed() {}
-function disarmed() {}
+function armed() {
+  screenUp.innerHTML = "Взять всё?";
+  screenDown.innerHTML = "";
+  screenID = 8;
+}
+function disarmed() {
+  screenUp.innerHTML = "Снять всё?";
+  screenDown.innerHTML = "";
+  screenID = 9;
+}
