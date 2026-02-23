@@ -9,7 +9,13 @@ const lFire = document.querySelector(".lFire");
 let inputBuffer = ""; // Хранилище для ввода
 const CORRECT_PIN = "2222"; // Правильный пароль
 let timerId; // Создаем переменную для хранения ID таймера
-let screenID = 0;
+let startDate;
+let startTime;
+let screenID;
+
+const menuItems = [clearAlarm, armed, disarmed];
+const labelsItems = ["ВЗЯТЬ", "СНЯТЬ", "СБРОС ТРЕВОГ"];
+let index = 0;
 
 init();
 
@@ -27,8 +33,7 @@ keyboard.addEventListener("click", (e) => {
   const val = btn.dataset.val;
 
   switch (screenID) {
-    case 1:
-      // Экран Пожар
+    case 1: // Экран Пожар
       if (val.length === 1 && !isNaN(val)) {
         inputBuffer += val;
         screenUp.innerHTML = "Пароль:";
@@ -54,7 +59,7 @@ keyboard.addEventListener("click", (e) => {
         logs();
       }
       break;
-    case 2:
+    case 2: // Меню
       console.log(val);
       if (val === "cancel") {
         inputBuffer = "";
@@ -62,44 +67,54 @@ keyboard.addEventListener("click", (e) => {
       } else if (val === "home") {
         inputBuffer = "";
         logs();
+      } else if (val === "ok") {
+        inputBuffer = "";
+        brakeAlarm();
       }
       // Code to execute if expression === value2
       break;
-    case 3:
+    case 3: // Журнал
       // Code to execute if expression === value2
-      console.log("3" + val);
       if (val === "cancel") {
-        inputBuffer = "";
         fire();
       } else if (val === "home") {
         inputBuffer = "";
         logs();
+      } else if (val === "ok") {
+        inputBuffer = "";
+        firelog();
       }
       break;
-    case 4:
+    case 4: // Событие
       // Code to execute if expression === value2
+      if (val === "cancel") {
+        logs();
+      }
       break;
-    case 5:
-      // Code to execute if expression === value2
+    case 5: // Code to execute if expression === value2
+      console.log("Сброс");
+
+      if (val === "cancel") {
+        menu();
+      } else if (val === "ok") {
+        clearAlarm();
+      }
       break;
-    case 6:
-      // Code to execute if expression === value2
+    case 6: // Code to execute if expression === value2
+      if (val === "cancel") {
+        lock.classList.remove("hide");
+        init();
+      }
+
       break;
-    case 7:
-      // Code to execute if expression === value2
+    case 7: // Code to execute if expression === value2
       break;
-    case 8:
-      // Code to execute if expression === value2
+    case 8: // Code to execute if expression === value2
       break;
-    case 9:
-      // Code to execute if expression === value2
+    case 9: // Code to execute if expression === value2
       break;
-    case 10:
-      // Code to execute if expression === value2
-      break;
-    // ... more cases
-    default:
-    // Code to execute if no case matches
+    case 10: // Code to execute if expression === value2
+      break; // ... more cases
   }
 
   // Если нажата цифра (длиной 1 символ)
@@ -112,13 +127,19 @@ function init() {
   update();
   timerId = setInterval(update, 1000);
   screenDown.innerHTML = "";
+  screenID = 0;
 }
 
-tranаing.addEventListener("click", function () {
+traning.addEventListener("click", function () {
   clearInterval(timerId);
   traning.classList.add("hide");
   lFire.classList.add("fire");
   fire();
+  const now = new Date();
+  startDate = now.toLocaleDateString();
+  startTime = now.toLocaleTimeString();
+  console.log(startDate);
+  console.log(startTime);
 });
 
 function fire() {
@@ -138,25 +159,62 @@ function logs() {
   console.log(screenID);
 }
 
-function menu() {
+function firelog() {
   screenUp.innerHTML = "1 этаж, каб. 10";
-  screenDown.innerHTML = "Взят";
-  lock.classList.add("hide");
-  screenID = 2;
+  screenDown.innerHTML = "";
+  lock.classList.remove("hide");
+  screenID = 4;
   console.log(screenID);
+
+  document.querySelector("#b1").addEventListener("mousedown", () => {
+    screenUp.innerHTML = "адрес 1 датчик 5";
+    screenDown.innerHTML = "";
+  });
+  document.querySelector("#b1").addEventListener("mouseup", () => {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "";
+  });
+  document.querySelector("#b2").addEventListener("mousedown", () => {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "адрес 1 датчик 5";
+  });
+  document.querySelector("#b2").addEventListener("mouseup", () => {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "";
+  });
+  document.querySelector("#b0").addEventListener("mousedown", () => {
+    screenUp.innerHTML = `${startTime}`;
+    screenDown.innerHTML = `${startDate}`;
+  });
+  document.querySelector("#b0").addEventListener("mouseup", () => {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "";
+  });
 }
 
-function brakeAlarm() {
-  screenUp.innerHTML = "10:31:25";
-  screenDown.innerHTML = "";
-}
-
-function clearAlarm() {
-  screenUp.innerHTML = "10:31:25";
-  screenDown.innerHTML = "";
+function menu() {
+  screenID = 2;
 }
 
 function setClearAlarm() {
-  screenUp.innerHTML = "10:31:25";
-  screenDown.innerHTML = "";
+  screenUp.innerHTML = "1 этаж, каб. 10";
+  screenDown.innerHTML = "Пожар: 1";
+  lock.classList.add("hide");
+  screenID = 5;
 }
+
+function brakeAlarm() {
+  screenUp.innerHTML = "Сбросить тревоги?";
+  screenDown.innerHTML = "";
+  screenID = 6;
+}
+
+function clearAlarm() {
+  screenUp.innerHTML = "Сброшено";
+  screenDown.innerHTML = "";
+  lFire.classList.remove("fire");
+  screenID = 7;
+}
+
+function armed() {}
+function disarmed() {}
