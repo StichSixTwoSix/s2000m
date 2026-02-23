@@ -116,9 +116,19 @@ keyboard.addEventListener("click", (e) => {
         init();
       }
       break;
-    case 8: // Code to execute if expression === value2
+    case 8: // Взять?
+      if (val === "cancel") {
+        menu();
+      } else if (val === "ok") {
+        armedConf();
+      }
       break;
-    case 9: // Code to execute if expression === value2
+    case 9: // Снять?
+      if (val === "cancel") {
+        menu();
+      } else if (val === "ok") {
+        disarmedConf();
+      }
       break;
     case 10: // Перебор меню
       if (val === "cancel") {
@@ -135,7 +145,7 @@ keyboard.addEventListener("click", (e) => {
             armed();
             break;
           case 1:
-            brakeAlarm();
+            disarmed();
             break;
           case 2:
             clearAlarm();
@@ -144,6 +154,16 @@ keyboard.addEventListener("click", (e) => {
         // menuItems[menuIndex](); // Запуск функции по индексу
       } else if (val === "reset") {
         brakeAlarm();
+      }
+      break;
+    case 11: // Взято
+      if (val === "cancel") {
+        menu();
+      }
+      break;
+    case 12: // Снято
+      if (val === "cancel") {
+        menu();
       }
       break;
   }
@@ -178,18 +198,30 @@ function fire() {
   screenDown.innerHTML = "1 этаж, каб. 10";
   lock.classList.remove("hide");
   screenID = 1;
-  document.querySelector("#bok").addEventListener("mousedown", () => {
+  const btnOk = document.querySelector("#bok");
+
+  const handleOkStart = (e) => {
     if (screenID === 1) {
+      if (e.type === "touchstart") e.preventDefault();
       screenUp.innerHTML = `${startTime}`;
       screenDown.innerHTML = `${startDate}`;
     }
-  });
-  document.querySelector("#bok").addEventListener("mouseup", () => {
+  };
+
+  const handleOkEnd = () => {
     if (screenID === 1) {
       screenUp.innerHTML = "10-ПОЖАР";
       screenDown.innerHTML = "1 этаж, каб. 10";
     }
-  });
+  };
+
+  // Мышь
+  btnOk.addEventListener("mousedown", handleOkStart);
+  btnOk.addEventListener("mouseup", handleOkEnd);
+
+  // Тачскрин
+  btnOk.addEventListener("touchstart", handleOkStart, { passive: false });
+  btnOk.addEventListener("touchend", handleOkEnd);
 }
 
 function logs() {
@@ -205,42 +237,65 @@ function firelog() {
   lock.classList.remove("hide");
   screenID = 4;
 
-  document.querySelector("#b1").addEventListener("mousedown", () => {
-    if (screenID === 4) {
-      screenUp.innerHTML = "адрес 1 датчик 5";
-      screenDown.innerHTML = "";
-    }
-  });
-  document.querySelector("#b1").addEventListener("mouseup", () => {
-    if (screenID === 4) {
-      screenUp.innerHTML = "1 этаж, каб. 10";
-      screenDown.innerHTML = "";
-    }
-  });
-  document.querySelector("#b2").addEventListener("mousedown", () => {
-    if (screenID === 4) {
-      screenUp.innerHTML = "1 этаж, каб. 10";
-      screenDown.innerHTML = "адрес 1 датчик 5";
-    }
-  });
-  document.querySelector("#b2").addEventListener("mouseup", () => {
-    if (screenID === 4) {
-      screenUp.innerHTML = "1 этаж, каб. 10";
-      screenDown.innerHTML = "";
-    }
-  });
-  document.querySelector("#b0").addEventListener("mousedown", () => {
-    if (screenID === 4) {
+  const setupButton = (id, onDown, onUp) => {
+    const btn = document.querySelector(id);
+    if (!btn) return;
+
+    const start = (e) => {
+      if (screenID === 4) {
+        if (e.type === "touchstart") e.preventDefault(); // Убираем конфликт тача и мыши
+        onDown();
+      }
+    };
+
+    const end = () => {
+      if (screenID === 4) onUp();
+    };
+
+    // Слушатели для мыши
+    btn.addEventListener("mousedown", start);
+    btn.addEventListener("mouseup", end);
+
+    // Слушатели для сенсора
+    btn.addEventListener("touchstart", start, { passive: false });
+    btn.addEventListener("touchend", end);
+  };
+
+  // Настройка кнопок:
+  const defaultText = () => {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "";
+  };
+
+  // Кнопка b0
+  setupButton(
+    "#b0",
+    () => {
       screenUp.innerHTML = `${startTime}`;
       screenDown.innerHTML = `${startDate}`;
-    }
-  });
-  document.querySelector("#b0").addEventListener("mouseup", () => {
-    if (screenID === 4) {
-      screenUp.innerHTML = "1 этаж, каб. 10";
+    },
+    defaultText,
+  );
+
+  // Кнопка b1
+  setupButton(
+    "#b1",
+    () => {
+      screenUp.innerHTML = "адрес 1 датчик 5";
       screenDown.innerHTML = "";
-    }
-  });
+    },
+    defaultText,
+  );
+
+  // Кнопка b2
+  setupButton(
+    "#b2",
+    () => {
+      screenUp.innerHTML = "1 этаж, каб. 10";
+      screenDown.innerHTML = "адрес 1 датчик 5";
+    },
+    defaultText,
+  );
 }
 
 function menu() {
@@ -278,4 +333,36 @@ function disarmed() {
   screenUp.innerHTML = "Снять всё?";
   screenDown.innerHTML = "";
   screenID = 9;
+}
+
+function armedConf() {
+  console.log(arm);
+  switch (arm) {
+    case 0:
+      arm = 1;
+      screenUp.innerHTML = "Взято успешно";
+      screenDown.innerHTML = "";
+      document.querySelector("#l-alarm").classList.remove("muted");
+      break;
+    case 1:
+      screenUp.innerHTML = "Так уже взято";
+      screenDown.innerHTML = "";
+      break;
+  }
+  screenID = 11;
+}
+function disarmedConf() {
+  switch (arm) {
+    case 1:
+      arm = 0;
+      screenUp.innerHTML = "Снято успешно";
+      screenDown.innerHTML = "";
+      document.querySelector("#l-alarm").classList.add("muted");
+      break;
+    case 0:
+      screenUp.innerHTML = "Так уже снято";
+      screenDown.innerHTML = "";
+      break;
+  }
+  screenID = 12;
 }
