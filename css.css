@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Roboto"; /* Название, которое вы будете использовать в коде */
-  src: url("./fonts/RobotoMono.ttf") format("truetype");
+  src: url("./RobotoMono.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
