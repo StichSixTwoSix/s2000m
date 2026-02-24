@@ -12,7 +12,8 @@ let timerId; // Создаем переменную для хранения ID �
 let startDate;
 let startTime;
 let screenID;
-let arm = 1;
+let arm = "Взято";
+let fireAlarm = 1;
 
 const menuItems = [clearAlarm, armed, brakeAlarm];
 const labelsItems = ["ВЗЯТЬ", "СНЯТЬ", "СБРОС ТРЕВОГ"];
@@ -38,6 +39,33 @@ keyboard.addEventListener("click", (e) => {
   const val = btn.dataset.val;
 
   switch (screenID) {
+    case 0: // Экран дежурный
+      clearInterval(timerId);
+      if (val.length === 1 && !isNaN(val)) {
+        inputBuffer += val;
+        screenUp.innerHTML = "Пароль:";
+        screenDown.innerHTML = "*".repeat(inputBuffer.length); // Имитация скрытия
+
+        // Автозапуск при достижении 4 символов
+        if (inputBuffer.length === 4) {
+          if (inputBuffer === CORRECT_PIN) {
+            inputBuffer = "";
+            passed();
+          } else {
+            screenUp.innerHTML = "Неверный пароль";
+            screenDown.innerHTML = "";
+            inputBuffer = "";
+            setTimeout(init, 2000); // Сброс через 1.5 сек после ошибки
+          }
+        }
+      } else if (val === "cancel") {
+        inputBuffer = "";
+        init();
+      } else if (val === "home") {
+        inputBuffer = "";
+        logs();
+      }
+      break;
     case 1: // Экран Пожар
       if (val.length === 1 && !isNaN(val)) {
         inputBuffer += val;
@@ -151,7 +179,6 @@ keyboard.addEventListener("click", (e) => {
             clearAlarm();
             break;
         }
-        // menuItems[menuIndex](); // Запуск функции по индексу
       } else if (val === "reset") {
         brakeAlarm();
       }
@@ -194,34 +221,39 @@ traning.addEventListener("click", function () {
 });
 
 function fire() {
-  screenUp.innerHTML = "10-ПОЖАР";
-  screenDown.innerHTML = "1 этаж, каб. 10";
-  lock.classList.remove("hide");
-  screenID = 1;
-  const btnOk = document.querySelector("#bok");
+  if (fireAlarm === 1) {
+    screenUp.innerHTML = "10-ПОЖАР";
+    screenDown.innerHTML = "1 этаж, каб. 10";
+    lock.classList.remove("hide");
+    screenID = 1;
+    const btnOk = document.querySelector("#bok");
 
-  const handleOkStart = (e) => {
-    if (screenID === 1) {
-      if (e.type === "touchstart") e.preventDefault();
-      screenUp.innerHTML = `${startTime}`;
-      screenDown.innerHTML = `${startDate}`;
-    }
-  };
+    const handleOkStart = (e) => {
+      if (screenID === 1) {
+        if (e.type === "touchstart") e.preventDefault();
+        screenUp.innerHTML = `${startTime}`;
+        screenDown.innerHTML = `${startDate}`;
+      }
+    };
 
-  const handleOkEnd = () => {
-    if (screenID === 1) {
-      screenUp.innerHTML = "10-ПОЖАР";
-      screenDown.innerHTML = "1 этаж, каб. 10";
-    }
-  };
+    const handleOkEnd = () => {
+      if (screenID === 1) {
+        screenUp.innerHTML = "10-ПОЖАР";
+        screenDown.innerHTML = "1 этаж, каб. 10";
+      }
+    };
 
-  // Мышь
-  btnOk.addEventListener("mousedown", handleOkStart);
-  btnOk.addEventListener("mouseup", handleOkEnd);
+    // Мышь
+    btnOk.addEventListener("mousedown", handleOkStart);
+    btnOk.addEventListener("mouseup", handleOkEnd);
 
-  // Тачскрин
-  btnOk.addEventListener("touchstart", handleOkStart, { passive: false });
-  btnOk.addEventListener("touchend", handleOkEnd);
+    // Тачскрин
+    btnOk.addEventListener("touchstart", handleOkStart, { passive: false });
+    btnOk.addEventListener("touchend", handleOkEnd);
+  } else if (fireAlarm === 0) {
+    lock.classList.remove("hide");
+    init();
+  }
 }
 
 function logs() {
@@ -304,8 +336,13 @@ function menu() {
 }
 
 function passed() {
-  screenUp.innerHTML = "1 этаж, каб. 10";
-  screenDown.innerHTML = "Пожар: 1";
+  if (fireAlarm === 1) {
+    screenUp.innerHTML = "1 этаж, каб. 10";
+    screenDown.innerHTML = "Пожар: 1";
+  } else if (fireAlarm === 0) {
+    screenUp.innerHTML = "1 этаж";
+    screenDown.innerHTML = arm;
+  }
   lock.classList.add("hide");
   screenID = 5;
 }
@@ -320,6 +357,7 @@ function clearAlarm() {
   screenUp.innerHTML = "Сброшено";
   screenDown.innerHTML = "";
   lFire.classList.remove("fire");
+  fireAlarm = 0;
   document.querySelector("#l-mute").classList.remove("muted");
   screenID = 7;
 }
@@ -338,13 +376,13 @@ function disarmed() {
 function armedConf() {
   console.log(arm);
   switch (arm) {
-    case 0:
-      arm = 1;
+    case "Снято":
+      arm = "Взято";
       screenUp.innerHTML = "Взято успешно";
       screenDown.innerHTML = "";
       document.querySelector("#l-alarm").classList.remove("muted");
       break;
-    case 1:
+    case "Взято":
       screenUp.innerHTML = "Так уже взято";
       screenDown.innerHTML = "";
       break;
@@ -353,13 +391,13 @@ function armedConf() {
 }
 function disarmedConf() {
   switch (arm) {
-    case 1:
-      arm = 0;
+    case "Взято":
+      arm = "Снято";
       screenUp.innerHTML = "Снято успешно";
       screenDown.innerHTML = "";
       document.querySelector("#l-alarm").classList.add("muted");
       break;
-    case 0:
+    case "Снято":
       screenUp.innerHTML = "Так уже снято";
       screenDown.innerHTML = "";
       break;
